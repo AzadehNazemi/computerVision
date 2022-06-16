@@ -12,7 +12,7 @@ output = cv2.connectedComponentsWithStats(
 (numLabels, labels, stats, centroids) = output
 output = image.copy()
 
-componentMask=np.zeros(image.shape[:2], dtype="uint8")
+mask=np.zeros(image.shape[:2], dtype="uint8")
 
 for i in range(1, numLabels):
     x = stats[i, cv2.CC_STAT_LEFT]
@@ -21,10 +21,19 @@ for i in range(1, numLabels):
     h = stats[i, cv2.CC_STAT_HEIGHT]
     area = stats[i, cv2.CC_STAT_AREA]
     (cX, cY) = centroids[i]
+	
+    keepWidth = w > 5 and w < 50
+    keepHeight = h > 5 and h < 50
+    keepArea = area > 50 and area < 150
 
-    cv2.circle(output, (int(cX), int(cY)), 4, (0, 0, 255), -1)
-    cv2.circle(componentMask, (int(cX), int(cY)), 4,255, -1)
-cv2.imshow("ConnectedComponentMask", componentMask)
+    if all((keepWidth, keepHeight, keepArea)):
+        print("[INFO] keeping connected component {}".format(i))
+        componentMask = (labels == i).astype("uint8") * 255
+        mask = cv2.bitwise_or(mask, componentMask)
+
+        cv2.circle(output, (int(cX), int(cY)), 4, (0, 0, 255), -1)
+cv2.imshow("ConnectedComponentMask", mask)
 cv2.waitKey(0)
 cv2.imshow("Output", output)
 cv2.waitKey(0)
+ 

@@ -7,41 +7,8 @@ from math import log, e
 import skimage
 from skimage import feature   
 from imutils.paths import list_images
-def solidity1(img):
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-    element = cv2.getStructuringElement(cv2.MORPH_CROSS,(6,6)) 
-    graydilate = cv2.erode(gray, element) #imgbnbin
-
-    
-    ret,thresh = cv2.threshold(graydilate,127,255,cv2.THRESH_BINARY_INV)   # binarize
-
-    imgbnbin = thresh
-
-
-    contours, hierarchy = cv2.findContours(imgbnbin, cv2.RETR_TREE ,cv2.CHAIN_APPROX_SIMPLE)
-    
-
-
-    Areacontours = list()
-    calcarea = 0.0
-    unicocnt = 0.0
-    for i in range (0, len(contours)):
-        area = cv2.contourArea(contours[i])
-        
-        if (area >=0 ):  #con 90 trova i segni e togli puntini
-            if (calcarea<area):
-                calcarea = area
-                unicocnt = contours[i]\
-
-   
-    area = cv2.contourArea(unicocnt)
-    hull = cv2.convexHull(unicocnt) 
-    hull_area = cv2.contourArea(hull)
-    solidity = float(area)/hull_area
-    return (solidity)
-
-def solidity2(img):
+def solidity(img):
     gray=img
     element = cv2.getStructuringElement(cv2.MORPH_CROSS,(6,6)) 
     graydilate = cv2.erode(gray, element) 
@@ -90,8 +57,8 @@ for  imagePath in list_images(sys.argv[1]):
     contrast= greycoprops(gcm, 'contrast').flatten()
     energy= greycoprops(gcm, 'energy').flatten()
     entrop=entropy(image)  
-    solid1=solidity1(image)
-    solid2=solidity2(image)
-    print(contrast,energy,correlation,homogeneity,blurr, entrop,solid1,solid2) 
+    solid=solidity(image)
+    
+    print(contrast,energy,correlation,homogeneity,blurr, entrop,solid) 
 
     feature=(contrast,energy,correlation,homogeneity,entrop)
